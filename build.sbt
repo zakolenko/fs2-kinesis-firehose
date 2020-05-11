@@ -222,6 +222,7 @@ lazy val core = project
   .settings(
     name := "fs2-kinesis-firehose-core",
     libraryDependencies ++= Seq(
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.6",
       "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.778",
       "co.fs2" %% "fs2-core" % "2.3.0",
       "com.github.cb372" %% "cats-retry" %  "1.1.0",
@@ -237,7 +238,7 @@ lazy val core = project
       "org.typelevel"  %% "cats-effect-laws" % CatsEffectVersion % Test,
       "cloud.localstack" % "localstack-utils" % "0.2.1" % Test,
       "org.scalatest" %% "scalatest-funspec" % "3.3.0-SNAP2" % Test,
-      "org.scalatest" %% "scalatest" % "3.3.0-SNAP2" % Test, 
+      "org.scalatest" %% "scalatest" % "3.3.0-SNAP2" % Test,
       "com.novocode" % "junit-interface" % "0.11" % Test
 
     ),
