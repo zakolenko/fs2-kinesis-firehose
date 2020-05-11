@@ -1,6 +1,0 @@
-Amazon Kinesis Data Firehose bindings for fs2
-
-Links:
-
- - [[https://zakolenko.github.io/fs2-kinesis-firehose Homepage]]
- - [[https://github.com/zakolenko/fs2-kinesis-firehose GitHub repository]]
