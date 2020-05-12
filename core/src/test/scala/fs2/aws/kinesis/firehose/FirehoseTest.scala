@@ -21,8 +21,8 @@ import cats.effect.{Resource, Sync}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model._
 import org.junit.Test
+import fs2.aws.kinesis.firehose.JavaConversions._
 
-import scala.jdk.CollectionConverters._
 import scala.util.Random
 
 class FirehoseTest extends BaseFirehoseTest {

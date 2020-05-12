@@ -31,7 +31,6 @@ import com.amazonaws.services.kinesisfirehose.model.Record
 import org.junit.runner.RunWith
 
 import scala.concurrent.ExecutionContext
-import scala.util.Random
 
 @RunWith(classOf[LocalstackTestRunner])
 @LocalstackDockerProperties(randomizePorts = true, services = Array("firehose"))
