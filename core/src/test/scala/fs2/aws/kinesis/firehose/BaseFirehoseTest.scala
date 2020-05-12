@@ -43,7 +43,11 @@ class BaseFirehoseTest {
 
   protected def runSync[T](f: Resource[IO, T]): T = f.use(IO.pure).unsafeRunSync()
 
-  protected def randomRecord: Record = new Record().withData(ByteBuffer.wrap(Random.nextBytes(10)))
+  protected def randomRecord: Record = new Record().withData(ByteBuffer.wrap {
+    val bytes = new Array[Byte](20)
+    scala.util.Random.nextBytes(bytes)
+    bytes
+  })
 
   protected def firehoseR: Resource[IO, Firehose[IO]] = {
     for {
