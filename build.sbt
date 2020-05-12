@@ -127,7 +127,7 @@ lazy val sharedSettings = Seq(
 
   developers := List(
     Developer(
-      id="zakolenko",
+      id="roman.zakolenko",
       name="Roman Zakolenko",
       email="zakolenkoroman@gmail.com",
       url=url("https://zakolenko.github.io")
@@ -222,7 +222,6 @@ lazy val core = project
   .settings(
     name := "fs2-kinesis-firehose-core",
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.6",
       "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.778",
       "co.fs2" %% "fs2-core" % "2.3.0",
       "com.github.cb372" %% "cats-retry" %  "1.1.0",
