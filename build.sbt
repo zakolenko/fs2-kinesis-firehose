@@ -1,6 +1,8 @@
 import BuildKeys._
 import Boilerplate._
 
+ThisBuild / includePluginResolvers := true
+
 // ---------------------------------------------------------------------------
 // Commands
 
