@@ -1,8 +1,6 @@
 import BuildKeys._
 import Boilerplate._
 
-ThisBuild / includePluginResolvers := true
-
 // ---------------------------------------------------------------------------
 // Commands
 
@@ -37,6 +35,7 @@ def defaultPlugins: Project ⇒ Project = pr => {
 }
 
 lazy val sharedSettings = Seq(
+  ThisBuild / includePluginResolvers := true,
   projectTitle := "fs2-kinesis-firehose",
   projectWebsiteRootURL := "https://zakolenko.github.io/",
   projectWebsiteBasePath := "/fs2-kinesis-firehose",
@@ -238,8 +237,6 @@ lazy val core = project
       "org.typelevel"  %% "cats-laws"        % CatsVersion % Test,
       "org.typelevel"  %% "cats-effect-laws" % CatsEffectVersion % Test,
       "cloud.localstack" % "localstack-utils" % "0.2.1" % Test,
-      "org.scalatest" %% "scalatest-funspec" % "3.3.0-SNAP2" % Test,
-      "org.scalatest" %% "scalatest" % "3.3.0-SNAP2" % Test,
       "com.novocode" % "junit-interface" % "0.11" % Test
 
     ),

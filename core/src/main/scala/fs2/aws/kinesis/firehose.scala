@@ -24,9 +24,9 @@ import cats.effect.{Concurrent, Timer}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model.{PutRecordBatchRequest, PutRecordBatchResult, Record}
 import retry.RetryPolicy
+import fs2.aws.kinesis.firehose.JavaConversions._
 
 import scala.collection.mutable.ArrayBuffer
-import scala.jdk.CollectionConverters._
 
 package object firehose {
 

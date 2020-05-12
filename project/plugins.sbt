@@ -1,5 +1,8 @@
 resolvers += Resolver.sbtPluginRepo("releases")
 resolvers += Resolver.sbtPluginRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("releases")
+resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("public")
 
 addSbtPlugin("com.47deg"                 % "sbt-microsites"                % "1.1.5")
 addSbtPlugin("com.eed3si9n"              % "sbt-unidoc"                    % "0.4.3")
