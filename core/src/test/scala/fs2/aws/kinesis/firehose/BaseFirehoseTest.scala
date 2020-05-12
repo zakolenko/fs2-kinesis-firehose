@@ -21,19 +21,15 @@ import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
 import cats.effect.{Blocker, ContextShift, IO, Resource, Timer}
-import cloud.localstack.docker.annotation.LocalstackDockerProperties
-import cloud.localstack.{Localstack, LocalstackTestRunner, TestUtils}
+import cloud.localstack.{Localstack, TestUtils}
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClientBuilder
 import com.amazonaws.services.kinesisfirehose.model.Record
-import org.junit.runner.RunWith
 
 import scala.concurrent.ExecutionContext
 
-@RunWith(classOf[LocalstackTestRunner])
-@LocalstackDockerProperties(randomizePorts = true, services = Array("firehose"))
 class BaseFirehoseTest {
   protected implicit val CS: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
   protected implicit val T: Timer[IO] = IO.timer(ExecutionContext.global)

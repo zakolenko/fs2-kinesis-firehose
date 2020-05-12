@@ -19,12 +19,17 @@ package fs2.aws.kinesis.firehose
 
 import cats.effect.{Resource, Sync}
 import cats.implicits._
+import cloud.localstack.LocalstackTestRunner
+import cloud.localstack.docker.annotation.LocalstackDockerProperties
 import com.amazonaws.services.kinesisfirehose.model._
 import org.junit.Test
 import fs2.aws.kinesis.firehose.JavaConversions._
+import org.junit.runner.RunWith
 
 import scala.util.Random
 
+@RunWith(classOf[LocalstackTestRunner])
+@LocalstackDockerProperties(randomizePorts = true, services = Array("firehose"))
 class FirehoseTest extends BaseFirehoseTest {
   import FirehoseTest._
 
