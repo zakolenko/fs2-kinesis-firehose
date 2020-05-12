@@ -1,6 +1,6 @@
 # fs2-kinesis-firehose
 
-[![Build](https://github.com/zakolenko/fs2-kinesis-firehose/workflows/build/badge.svg?branch=master)](https://github.com/zakolenko/fs2-kinesis-firehose/actions?query=branch%3Amaster+workflow%3Abuild) [![Release](https://github.com/zakolenko/fs2-kinesis-firehose/workflows/release/badge.svg)](https://github.com/zakolenko/fs2-kinesis-firehose/actions?query=workflow%3Arelease) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.zakolenko/fs2-kinesis-firehose-core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.zakolenko/fs2-kinesis-firehose-core_2.13)
+[![Build](https://github.com/zakolenko/fs2-kinesis-firehose/workflows/build/badge.svg?branch=master)](https://github.com/zakolenko/fs2-kinesis-firehose/actions?query=branch%3Amaster+workflow%3Abuild) [![Release](https://github.com/zakolenko/fs2-kinesis-firehose/workflows/release/badge.svg)](https://github.com/zakolenko/fs2-kinesis-firehose/actions?query=workflow%3Arelease) [![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/io.github.zakolenko/fs2-kinesis-firehose-core_2.13.svg?server=https%3A%2F%2Foss.sonatype.org&color=blue)](https://repo1.maven.org/maven2/io/github/zakolenko/fs2-kinesis-firehose-core_2.13/)
 
 Amazon Kinesis Data Firehose bindings for fs2
 
@@ -30,3 +30,5 @@ Feel free to open an issue if you notice a bug, have an idea for a feature, or h
 ## License
 
 All code in this repository is licensed under the Apache License, Version 2.0.  See [LICENCE](./LICENSE.md).
+
+[Link-SonatypeReleases]: https://oss.sonatype.org/content/repositories/releases/dev/zio/zio_2.12/ "Sonatype Releases"
