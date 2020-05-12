@@ -34,6 +34,12 @@ def defaultPlugins: Project ⇒ Project = pr => {
     .enablePlugins(GitBranchPrompt)
 }
 
+def xmaxClassfileName(scalaVersion: String) =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, 12)) => Seq("-Xmax-classfile-name", "80")
+    case _ => Seq.empty
+  }
+
 lazy val sharedSettings = Seq(
   projectTitle := "fs2-kinesis-firehose",
   projectWebsiteRootURL := "https://zakolenko.github.io/",
@@ -62,6 +68,8 @@ lazy val sharedSettings = Seq(
   scalacOptions.in(Compile, doc) ~= filterConsoleScalacOptions,
   // Silence all warnings from src_managed files
   scalacOptions += "-P:silencer:pathFilters=.*[/]src_managed[/].*",
+  
+  scalacOptions ++= xmaxClassfileName(scalaVersion.value),
 
   addCompilerPlugin("org.typelevel" % "kind-projector" % KindProjectorVersion cross CrossVersion.full),
   addCompilerPlugin("com.olegpy" %% "better-monadic-for" % BetterMonadicForVersion),

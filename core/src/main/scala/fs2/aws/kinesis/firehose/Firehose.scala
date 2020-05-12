@@ -24,7 +24,7 @@ import com.amazonaws.services.kinesisfirehose.model._
 import com.amazonaws.services.kinesisfirehose._
 import retry.{RetryPolicy, Sleep}
 
-import scala.jdk.CollectionConverters._
+import fs2.aws.kinesis.firehose.JavaConversions._
 
 trait Firehose[F[_]] {
 
