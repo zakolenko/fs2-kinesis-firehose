@@ -17,4 +17,16 @@
 
 package fs2.aws.kinesis.firehose
 
-object implicits extends FirehoseOpsSyntax with RecordOpsSyntax
+import java.nio.ByteBuffer
+
+import com.amazonaws.services.kinesisfirehose.model.Record
+
+class RecordOps[T](private val t: T) extends AnyVal {
+
+  def asRecord()(implicit ser: Serializer[T]): Record = new Record().withData(ByteBuffer.wrap(ser(t)))
+}
+
+trait RecordOpsSyntax {
+
+  implicit def toRecordOps[T](t: T): RecordOps[T] = new RecordOps(t)
+}

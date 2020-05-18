@@ -42,21 +42,22 @@ package object firehose {
     _.mapAsync(parallelism)(put)
   }
 
-  def produceChunks[
+  private def produceChunks[
     F[_]: Concurrent: Timer,
     C[_]: Foldable,
     T: Serializer
   ](
     stream: String,
-    parallelism: Int = 1,
-    mRetryPolicy: Option[RetryPolicy[F]] = None
+    separator: Array[Byte],
+    parallelism: Int,
+    mRetryPolicy: Option[RetryPolicy[F]]
   )(
     client: Firehose[F]
   ): fs2.Pipe[F, C[T], PutRecordBatchResult] = { chunks =>
     chunks
       .map { chunk =>
         val records = chunk.foldLeft(ArrayBuffer.empty[Record]) { (buff, x) =>
-          buff += new Record().withData(ByteBuffer.wrap(Serializer[T].apply(x)))
+          buff += new Record().withData(ByteBuffer.wrap(Serializer[T].apply(x) ++ separator))
         }
 
         new PutRecordBatchRequest().withDeliveryStreamName(stream).withRecords(records.asJava)
@@ -68,10 +69,11 @@ package object firehose {
     client: Firehose[F]
   ): fs2.Pipe[F, T, PutRecordBatchResult] = { elements =>
     elements
-      .groupWithin(settings.batchSize, settings.timeWindow)
+      .groupWithin(settings.batchSize.value, settings.timeWindow)
       .through(
         produceChunks(
           settings.deliveryStream,
+          settings.separator,
           settings.parallelism,
           settings.retryPolicy
         )(client)

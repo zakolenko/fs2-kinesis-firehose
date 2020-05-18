@@ -226,6 +226,7 @@ lazy val core = project
       "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.778",
       "co.fs2" %% "fs2-core" % "2.3.0",
       "com.github.cb372" %% "cats-retry" %  "1.1.0",
+      "eu.timepit" %% "refined" % "0.9.14",
       "io.estatico"    %% "newtype"          % NewtypeVersion % Provided,
       "org.typelevel"  %% "simulacrum"       % SimulacrumVersion % Provided,
       "org.typelevel"  %% "cats-core"        % CatsVersion,

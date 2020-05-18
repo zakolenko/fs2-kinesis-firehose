@@ -17,9 +17,15 @@
 
 package fs2.aws.kinesis.firehose
 
+import cats.Foldable
 import cats.effect.{Resource, Sync}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model._
+import fs2.aws.kinesis.firehose.implicits._
+import fs2.aws.kinesis.firehose.JavaConversions._
+import fs2.aws.kinesis.firehose.{Serializer => FirehoseSerializer}
+
+import scala.collection.mutable.ArrayBuffer
 
 class FirehoseOps[F[_]](private val f: Firehose[F]) extends AnyVal {
 
@@ -31,6 +37,20 @@ class FirehoseOps[F[_]](private val f: Firehose[F]) extends AnyVal {
       f.deleteStream(new DeleteDeliveryStreamRequest().withDeliveryStreamName(request.getDeliveryStreamName)).void
 
     Resource.make(create)(delete)
+  }
+
+  def put[T: FirehoseSerializer](streamName: String, x: T): F[PutRecordResult] = {
+    f.put(
+      new PutRecordRequest().withDeliveryStreamName(streamName).withRecord(x.asRecord)
+    )
+  }
+
+  def batchPut[T: FirehoseSerializer, CC[_]: Foldable](streamName: String, xs: CC[T]): F[PutRecordBatchResult] = {
+    f.put(
+      new PutRecordBatchRequest()
+        .withDeliveryStreamName(streamName)
+        .withRecords(xs.foldLeft(ArrayBuffer.empty[Record])(_ += _.asRecord).asJava)
+    )
   }
 }
 

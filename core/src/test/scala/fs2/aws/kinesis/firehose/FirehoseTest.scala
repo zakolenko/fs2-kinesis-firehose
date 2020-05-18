@@ -24,6 +24,7 @@ import cloud.localstack.docker.annotation.LocalstackDockerProperties
 import com.amazonaws.services.kinesisfirehose.model._
 import org.junit.Test
 import fs2.aws.kinesis.firehose.JavaConversions._
+import fs2.aws.kinesis.firehose.implicits._
 import org.junit.runner.RunWith
 
 import scala.util.Random
@@ -54,12 +55,7 @@ class FirehoseTest extends BaseFirehoseTest {
       for {
         firehose <- firehoseR
         stream <- firehose.testStream()
-        response <- Resource.liftF(
-          firehose.put(new PutRecordBatchRequest()
-            .withDeliveryStreamName(stream)
-            .withRecords(randomRecord, randomRecord)
-          )
-        )
+        response <- Resource.liftF(firehose.batchPut(stream, List.fill(500)(randomBytes(1000))))
       } yield assert(response.getFailedPutCount == 0)
     }
   }
