@@ -77,7 +77,7 @@ object Firehose {
         for {
           reqRef <- Ref.of[F, PutRecordBatchRequest](request)
           res <- {
-            retryingM[Either[Throwable, PutRecordBatchResult]](
+            retryingOnFailures[Either[Throwable, PutRecordBatchResult]](
               retryPolicy,
               _.fold(_ => false, _.getFailedPutCount <= 0),
               (errorOrResp, _) => {
