@@ -42,10 +42,10 @@ jobs:
         with:
           java-version: 1.8
 
-      - name: Set up Ruby 2.6 (for microsite)
+      - name: Set up Ruby 2.7 (for microsite)
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: 2.6.x
+          ruby-version: 2.7.x
 
       - name: Install microsite dependencies
         run: |
