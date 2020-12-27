@@ -48,7 +48,7 @@ lazy val sharedSettings = Seq(
   githubRelativeRepositoryID := "fs2-kinesis-firehose",
 
   organization := "io.github.zakolenko",
-  scalaVersion := "2.12.10",
+  scalaVersion := "2.13.3",
   crossScalaVersions := Seq("2.12.10", "2.13.3"),
 
   // More version specific compiler options
@@ -144,7 +144,7 @@ lazy val sharedSettings = Seq(
 def defaultProjectConfiguration(pr: Project) = {
   pr.configure(defaultPlugins)
     .settings(sharedSettings)
-    .settings(doctestTestSettings(DoctestTestFramework.ScalaTest))
+    .settings(doctestTestSettings(DoctestTestFramework.Minitest))
     .settings(crossVersionSharedSources)
     .settings(requiredMacroCompatDeps(MacroParadiseVersion))
     .settings(filterOutMultipleDependenciesFromGeneratedPomXml(
