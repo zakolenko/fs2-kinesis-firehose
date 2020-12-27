@@ -40,11 +40,11 @@ class FirehoseTest extends BaseFirehoseTest {
       for {
         firehose <- firehoseR
         stream <- firehose.testStream()
-        _ <- Resource.liftF(firehose.put(
-          new PutRecordRequest()
-            .withDeliveryStreamName(stream)
-            .withRecord(randomRecord)
-        ))
+        _ <- Resource.liftF(
+          firehose.put(
+            new PutRecordRequest().withDeliveryStreamName(stream).withRecord(randomRecord)
+          )
+        )
       } yield ()
     }
   }
@@ -65,9 +65,11 @@ class FirehoseTest extends BaseFirehoseTest {
     runSync {
       for {
         firehose <- firehoseR
-        res <- Resource.liftF(firehose.describeStream(
-          new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString)
-        ))
+        res <- Resource.liftF(
+          firehose.describeStream(
+            new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString)
+          )
+        )
       } yield assert(res.isEmpty)
     }
   }
@@ -78,9 +80,11 @@ class FirehoseTest extends BaseFirehoseTest {
       for {
         firehose <- firehoseR
         stream <- firehose.testStream()
-        res <- Resource.liftF(firehose.describeStream(
-          new DescribeDeliveryStreamRequest().withDeliveryStreamName(stream)
-        ))
+        res <- Resource.liftF(
+          firehose.describeStream(
+            new DescribeDeliveryStreamRequest().withDeliveryStreamName(stream)
+          )
+        )
       } yield assert(res.nonEmpty)
     }
   }
@@ -98,15 +102,19 @@ class FirehoseTest extends BaseFirehoseTest {
 }
 
 object FirehoseTest {
+
   implicit class FirehoseOps[F[_]](private val f: Firehose[F]) extends AnyVal {
     import fs2.aws.kinesis.firehose.implicits._
 
-    def testStream(name: String = s"test-stream-${Random.alphanumeric.take(5).mkString}")(implicit F: Sync[F]): Resource[F, String] = {
+    def testStream(
+      name: String = s"test-stream-${Random.alphanumeric.take(5).mkString}"
+    )(implicit F: Sync[F]): Resource[F, String] = {
       f.streamAsResource(
-        new CreateDeliveryStreamRequest()
-          .withDeliveryStreamName(name)
-          .withDeliveryStreamType(DeliveryStreamType.DirectPut)
-      ).as(name)
+          new CreateDeliveryStreamRequest()
+            .withDeliveryStreamName(name)
+            .withDeliveryStreamType(DeliveryStreamType.DirectPut)
+        )
+        .as(name)
     }
   }
 }
