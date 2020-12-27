@@ -15,16 +15,17 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 // ---------------------------------------------------------------------------
 // Dependencies
 
-val CatsVersion = "2.1.1"
-val CatsEffectVersion = "2.1.2"
 val NewtypeVersion = "0.4.3"
+val CatsVersion = "2.2.0"
+val CatsEffectVersion = "2.2.0"
 val SimulacrumVersion = "1.0.0"
-val MacroParadiseVersion = "2.1.0"
-val MinitestVersion = "2.8.2"
+val MacroParadiseVersion = "2.1.1"
+val ScalaTestVersion = "3.2.2"
+val ScalaTestPlusVersion = "3.2.2.0"
 val ScalaCheckVersion = "1.14.3"
 val KindProjectorVersion = "0.11.0"
 val BetterMonadicForVersion = "0.3.1"
-val SilencerVersion = "1.6.0"
+val SilencerVersion = "1.7.1"
 
 /**
   * Defines common plugins between all projects.
@@ -202,7 +203,7 @@ lazy val site = project.in(file("site"))
       micrositeCompilingDocsTool := WithMdoc,
       fork in mdoc := true,
       scalacOptions.in(Tut) ~= filterConsoleScalacOptions,
-      libraryDependencies += "com.47deg" %% "github4s" % "0.23.0",
+      libraryDependencies += "com.47deg" %% "github4s" % "0.26.0",
       micrositePushSiteWith := GitHub4s,
       micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
       micrositeExtraMdFiles := Map(
@@ -237,8 +238,6 @@ lazy val core = project
       "org.typelevel"  %% "cats-core"        % CatsVersion,
       "org.typelevel"  %% "cats-effect"      % CatsEffectVersion,
       // For testing
-      "io.monix"       %% "minitest"         % MinitestVersion % Test,
-      "io.monix"       %% "minitest-laws"    % MinitestVersion % Test,
       "org.scalacheck" %% "scalacheck"       % ScalaCheckVersion % Test,
       "org.typelevel"  %% "cats-laws"        % CatsVersion % Test,
       "org.typelevel"  %% "cats-effect-laws" % CatsEffectVersion % Test,
