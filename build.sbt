@@ -4,8 +4,13 @@ import Boilerplate._
 // ---------------------------------------------------------------------------
 // Commands
 
-addCommandAlias("release", ";+clean ;ci-release ;unidoc ;microsite/publishMicrosite")
-addCommandAlias("ci", ";project root ;reload ;+clean ;+test:compile ;+test ;+package ;unidoc ;site/makeMicrosite")
+lazy val aggregatorIDs = Seq("core")
+
+addCommandAlias("ci-jvm",     ";" + aggregatorIDs.map(id => s"$id/clean ;$id/test:compile ;$id/test").mkString(";"))
+addCommandAlias("ci-package", ";scalafmtCheckAll ;package")
+addCommandAlias("ci-doc",     ";unidoc ;site/makeMicrosite")
+addCommandAlias("ci",         ";project root ;reload ;+scalafmtCheckAll ;+ci-jvm ;+package ;ci-doc")
+addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosite")
 
 // ---------------------------------------------------------------------------
 // Dependencies
