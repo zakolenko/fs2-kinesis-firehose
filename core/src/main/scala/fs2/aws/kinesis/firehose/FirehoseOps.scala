@@ -41,7 +41,7 @@ class FirehoseOps[F[_]](private val f: Firehose[F]) extends AnyVal {
 
   def put[T: FirehoseSerializer](streamName: String, x: T): F[PutRecordResult] = {
     f.put(
-      new PutRecordRequest().withDeliveryStreamName(streamName).withRecord(x.asRecord)
+      new PutRecordRequest().withDeliveryStreamName(streamName).withRecord(x.asRecord())
     )
   }
 
@@ -49,7 +49,7 @@ class FirehoseOps[F[_]](private val f: Firehose[F]) extends AnyVal {
     f.put(
       new PutRecordBatchRequest()
         .withDeliveryStreamName(streamName)
-        .withRecords(xs.foldLeft(ArrayBuffer.empty[Record])(_ += _.asRecord).asJava)
+        .withRecords(xs.foldLeft(ArrayBuffer.empty[Record])(_ += _.asRecord()).asJava)
     )
   }
 }
