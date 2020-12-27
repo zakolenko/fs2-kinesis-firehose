@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v5
+      - uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.${{ matrix.java }}"
 
@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v5
+      - uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.${{ matrix.java }}"
 
@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: olafurpg/setup-scala@v5
+      - uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.${{ matrix.java }}"
 
@@ -84,7 +84,6 @@ jobs:
       - name: Install microsite dependencies
         run: |
           bundle install --system --gemfile=site/Gemfile
-
       - name: sbt ++${{ matrix.scala }} ${{ matrix.command }}
         run: |
           ./.github/scripts/build.sh
@@ -109,7 +108,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v2
+      - uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.8"
 
@@ -142,7 +141,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1
-      - uses: olafurpg/setup-scala@v2
+      - uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.8"
 
@@ -154,7 +153,6 @@ jobs:
       - name: Install microsite dependencies
         run: |
           bundle install --system --gemfile=site/Gemfile
-
       - name: Publish Website
         run: sbt +clean site/publishMicrosite
         env:
