@@ -237,7 +237,7 @@ lazy val core = project
       "org.scalacheck" %% "scalacheck"       % ScalaCheckVersion % Test,
       "org.typelevel"  %% "cats-laws"        % CatsVersion % Test,
       "org.typelevel"  %% "cats-effect-laws" % CatsEffectVersion % Test,
-      "cloud.localstack" % "localstack-utils" % "0.2.1" % Test,
+      "cloud.localstack" % "localstack-utils" % "0.2.5" % Test,
       "com.novocode" % "junit-interface" % "0.11" % Test
 
     ),

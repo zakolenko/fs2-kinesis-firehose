@@ -21,8 +21,8 @@ import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
 import cats.effect.{Blocker, ContextShift, IO, Resource, Timer}
-import cloud.localstack.{Localstack, TestUtils}
-import com.amazonaws.auth.AWSStaticCredentialsProvider
+import cloud.localstack.{CommonUtils, Constants, Localstack}
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClientBuilder
@@ -34,7 +34,7 @@ class BaseFirehoseTest {
   protected implicit val CS: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
   protected implicit val T: Timer[IO] = IO.timer(ExecutionContext.global)
 
-  TestUtils.setEnv("AWS_CBOR_DISABLE", "1")
+  CommonUtils.setEnv("AWS_CBOR_DISABLE", "1")
 
   protected def runSync[T](f: Resource[IO, T]): T = f.use(IO.pure).unsafeRunSync()
 
@@ -63,7 +63,14 @@ class BaseFirehoseTest {
               Regions.US_EAST_1.getName
             )
           )
-          .withCredentials(new AWSStaticCredentialsProvider(TestUtils.TEST_CREDENTIALS)),
+          .withCredentials(
+            new AWSStaticCredentialsProvider(
+              new BasicAWSCredentials(
+                Constants.TEST_ACCESS_KEY,
+                Constants.TEST_SECRET_KEY
+              )
+            )
+          ),
         blocker
       )
     } yield firehose
