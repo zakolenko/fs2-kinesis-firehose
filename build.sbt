@@ -25,7 +25,6 @@ val ScalaTestPlusVersion = "3.2.2.0"
 val ScalaCheckVersion = "1.14.3"
 val KindProjectorVersion = "0.11.0"
 val BetterMonadicForVersion = "0.3.1"
-val SilencerVersion = "1.7.1"
 
 /**
   * Defines common plugins between all projects.
@@ -49,7 +48,7 @@ lazy val sharedSettings = Seq(
   githubRelativeRepositoryID := "fs2-kinesis-firehose",
 
   organization := "io.github.zakolenko",
-  scalaVersion := "2.13.3",
+  scalaVersion := "2.12.10",
   crossScalaVersions := Seq("2.12.10", "2.13.3"),
 
   // More version specific compiler options
@@ -67,12 +66,10 @@ lazy val sharedSettings = Seq(
 
     // Turning off fatal warnings for doc generation
   scalacOptions.in(Compile, doc) ~= filterConsoleScalacOptions,
-  // Silence all warnings from src_managed files
-  scalacOptions += "-P:silencer:pathFilters=.*[/]src_managed[/].*",
+
 
   addCompilerPlugin("org.typelevel" % "kind-projector" % KindProjectorVersion cross CrossVersion.full),
   addCompilerPlugin("com.olegpy" %% "better-monadic-for" % BetterMonadicForVersion),
-  addCompilerPlugin("com.github.ghik" % "silencer-plugin" % SilencerVersion cross CrossVersion.full),
 
   // ScalaDoc settings
   autoAPIMappings := true,
@@ -147,12 +144,11 @@ lazy val sharedSettings = Seq(
 def defaultProjectConfiguration(pr: Project) = {
   pr.configure(defaultPlugins)
     .settings(sharedSettings)
-    .settings(doctestTestSettings(DoctestTestFramework.Minitest))
+    .settings(doctestTestSettings(DoctestTestFramework.ScalaTest))
     .settings(crossVersionSharedSources)
     .settings(requiredMacroCompatDeps(MacroParadiseVersion))
     .settings(filterOutMultipleDependenciesFromGeneratedPomXml(
       "groupId" -> "org.scoverage".r :: Nil,
-      "groupId" -> "io.estatico".r   :: "artifactId" -> "newtype".r    :: Nil,
       "groupId" -> "org.typelevel".r :: "artifactId" -> "simulacrum".r :: Nil,
     ))
 }
