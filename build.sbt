@@ -195,9 +195,7 @@ lazy val site = project.in(file("site"))
         "gray-lighter" -> "#F4F3F4",
         "white-color" -> "#FFFFFF"
       ),
-      micrositeCompilingDocsTool := WithMdoc,
       fork in mdoc := true,
-      scalacOptions.in(Tut) ~= filterConsoleScalacOptions,
       libraryDependencies += "com.47deg" %% "github4s" % "0.26.0",
       micrositePushSiteWith := GitHub4s,
       micrositeGithubToken := sys.env.get("GITHUB_TOKEN"),
