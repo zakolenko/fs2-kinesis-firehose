@@ -2,7 +2,8 @@ import sbt.Def._
 import sbt.{Def, settingKey}
 
 object BuildKeys {
-   /**
+
+  /**
     * Human readable project title.
     *
     * Examples:
@@ -70,5 +71,5 @@ object BuildKeys {
     * Auto-detected by the build process.
     */
   lazy val needsScalaMacroParadise =
-    settingKey[Boolean]("Needs Scala Macro Paradise")        
+    settingKey[Boolean]("Needs Scala Macro Paradise")
 }
