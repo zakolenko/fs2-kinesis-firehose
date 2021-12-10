@@ -40,7 +40,7 @@ class FirehoseTest extends BaseFirehoseTest {
       for {
         firehose <- firehoseR
         stream <- firehose.testStream()
-        _ <- Resource.liftF(
+        _ <- Resource.eval(
           firehose.put(
             new PutRecordRequest().withDeliveryStreamName(stream).withRecord(randomRecord)
           )
@@ -55,7 +55,7 @@ class FirehoseTest extends BaseFirehoseTest {
       for {
         firehose <- firehoseR
         stream <- firehose.testStream()
-        response <- Resource.liftF(firehose.batchPut(stream, List.fill(500)(randomBytes(1000))))
+        response <- Resource.eval(firehose.batchPut(stream, List.fill(500)(randomBytes(1000))))
       } yield assert(response.getFailedPutCount == 0)
     }
   }
@@ -65,7 +65,7 @@ class FirehoseTest extends BaseFirehoseTest {
     runSync {
       for {
         firehose <- firehoseR
-        res <- Resource.liftF(
+        res <- Resource.eval(
           firehose.describeStream(
             new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString)
           )
@@ -80,7 +80,7 @@ class FirehoseTest extends BaseFirehoseTest {
       for {
         firehose <- firehoseR
         stream <- firehose.testStream()
-        res <- Resource.liftF(
+        res <- Resource.eval(
           firehose.describeStream(
             new DescribeDeliveryStreamRequest().withDeliveryStreamName(stream)
           )
@@ -95,7 +95,7 @@ class FirehoseTest extends BaseFirehoseTest {
       for {
         firehose <- firehoseR
         stream <- firehose.testStream()
-        res <- Resource.liftF(firehose.listStreams(new ListDeliveryStreamsRequest()))
+        res <- Resource.eval(firehose.listStreams(new ListDeliveryStreamsRequest()))
       } yield assert(res.getDeliveryStreamNames.asScala == List(stream))
     }
   }

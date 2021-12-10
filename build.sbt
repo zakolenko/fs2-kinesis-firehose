@@ -15,15 +15,14 @@ addCommandAlias("release",    ";+clean ;ci-release ;unidoc ;site/publishMicrosit
 // ---------------------------------------------------------------------------
 // Dependencies
 
-val NewtypeVersion = "0.4.3"
-val CatsVersion = "2.2.0"
-val CatsEffectVersion = "2.2.0"
-val SimulacrumVersion = "1.0.0"
+val NewtypeVersion = "0.4.4"
+val CatsVersion = "2.6.1"
+val CatsEffectVersion = "2.5.4"
 val MacroParadiseVersion = "2.1.1"
 val ScalaTestVersion = "3.2.2"
 val ScalaTestPlusVersion = "3.2.2.0"
 val ScalaCheckVersion = "1.14.3"
-val KindProjectorVersion = "0.11.0"
+val KindProjectorVersion = "0.13.2"
 val BetterMonadicForVersion = "0.3.1"
 
 /**
@@ -225,12 +224,10 @@ lazy val core = project
   .settings(
     name := "fs2-kinesis-firehose-core",
     libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.778",
-      "co.fs2" %% "fs2-core" % "2.3.0",
-      "com.github.cb372" %% "cats-retry" %  "2.1.0",
+      "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.816",
+      "co.fs2" %% "fs2-core" % "2.5.9",
+      "com.github.cb372" %% "cats-retry" %  "2.1.1",
       "eu.timepit" %% "refined" % "0.9.14",
-      "io.estatico"    %% "newtype"          % NewtypeVersion % Provided,
-      "org.typelevel"  %% "simulacrum"       % SimulacrumVersion % Provided,
       "org.typelevel"  %% "cats-core"        % CatsVersion,
       "org.typelevel"  %% "cats-effect"      % CatsEffectVersion,
       // For testing
