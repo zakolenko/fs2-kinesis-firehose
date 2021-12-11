@@ -15,13 +15,13 @@ addCommandAlias("release", ";+clean ;ci-release ;unidoc ;site/publishMicrosite")
 // ---------------------------------------------------------------------------
 // Dependencies
 
-val NewtypeVersion = "0.4.4"
 val CatsVersion = "2.6.1"
-val CatsEffectVersion = "2.5.4"
+val CatsEffectVersion = "3.1.1"
+val FS2Version = "3.0.6"
+val AwsSdkVersion = "1.11.816"
+val CatsRetryVersion = "3.1.0"
+val RefinedVersion = "0.9.14"
 val MacroParadiseVersion = "2.1.1"
-val ScalaTestVersion = "3.2.2"
-val ScalaTestPlusVersion = "3.2.2.0"
-val ScalaCheckVersion = "1.14.3"
 val KindProjectorVersion = "0.13.2"
 val BetterMonadicForVersion = "0.3.1"
 
@@ -220,17 +220,17 @@ lazy val core = project
   .settings(
     name := "fs2-kinesis-firehose-core",
     libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk-kinesis" % "1.11.816",
-      "co.fs2" %% "fs2-core" % "2.5.9",
-      "com.github.cb372" %% "cats-retry" % "2.1.1",
-      "eu.timepit" %% "refined" % "0.9.14",
+      "com.amazonaws" % "aws-java-sdk-kinesis" % AwsSdkVersion,
+      "co.fs2" %% "fs2-core" % FS2Version,
+      "com.github.cb372" %% "cats-retry" % CatsRetryVersion,
+      "eu.timepit" %% "refined" % RefinedVersion,
       "org.typelevel" %% "cats-core" % CatsVersion,
       "org.typelevel" %% "cats-effect" % CatsEffectVersion,
+      "org.typelevel" %% "cats-effect-std" % CatsEffectVersion,
       // For testing
-      "org.scalacheck" %% "scalacheck" % ScalaCheckVersion % Test,
       "com.dimafeng" %% "testcontainers-scala-localstack" % "0.39.12" % Test,
       "com.dimafeng" %% "testcontainers-scala-munit" % "0.39.12" % Test,
-      "org.typelevel" %% "munit-cats-effect-2" % "1.0.0" % Test,
+      "org.typelevel" %% "munit-cats-effect-3" % "1.0.0" % Test,
       "org.scalameta" %% "munit" % "0.7.29" % Test
     )
   )
