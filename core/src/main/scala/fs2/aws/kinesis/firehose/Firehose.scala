@@ -17,13 +17,11 @@
 
 package fs2.aws.kinesis.firehose
 
-import cats.effect.concurrent.Ref
-import cats.effect.{Blocker, ContextShift, Resource, Sync}
+import cats.effect.{Ref, Resource, Sync}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model._
 import com.amazonaws.services.kinesisfirehose._
 import retry.{RetryPolicy, Sleep}
-
 import fs2.aws.kinesis.firehose.JavaConversions._
 
 trait Firehose[F[_]] {
@@ -59,14 +57,14 @@ trait Firehose[F[_]] {
 
 object Firehose {
 
-  def apply[F[_]: Sync: Sleep: ContextShift](client: AmazonKinesisFirehose, blocker: Blocker): Firehose[F] =
+  def apply[F[_]: Sync: Sleep](client: AmazonKinesisFirehose): Firehose[F] =
     new Firehose[F] {
       import ErrorUtils._
 
-      override def put(record: PutRecordRequest): F[PutRecordResult] = blocker.delay(client.putRecord(record))
+      override def put(record: PutRecordRequest): F[PutRecordResult] = Sync[F].blocking(client.putRecord(record))
 
       override def put(records: PutRecordBatchRequest): F[PutRecordBatchResult] =
-        blocker.delay(client.putRecordBatch(records))
+        Sync[F].blocking(client.putRecordBatch(records))
 
       override def putWithRetry(
         request: PutRecordBatchRequest,
@@ -79,7 +77,7 @@ object Firehose {
           res <- {
             retryingOnFailures[Either[Throwable, PutRecordBatchResult]](
               retryPolicy,
-              _.fold(_ => false, _.getFailedPutCount <= 0),
+              _.fold(_ => false, _.getFailedPutCount <= 0).pure[F],
               (errorOrResp, _) => {
                 errorOrResp.fold(
                   _ => Sync[F].unit,
@@ -106,49 +104,48 @@ object Firehose {
       }
 
       override def createStream(request: CreateDeliveryStreamRequest): F[CreateDeliveryStreamResult] =
-        blocker.delay(client.createDeliveryStream(request))
+        Sync[F].blocking(client.createDeliveryStream(request))
 
       override def deleteStream(request: DeleteDeliveryStreamRequest): F[Option[DeleteDeliveryStreamResult]] =
-        blocker.delay(client.deleteDeliveryStream(request)).handle404()
+        Sync[F].blocking(client.deleteDeliveryStream(request)).handle404()
 
       override def describeStream(request: DescribeDeliveryStreamRequest): F[Option[DescribeDeliveryStreamResult]] =
-        blocker.delay(client.describeDeliveryStream(request)).handle404()
+        Sync[F].blocking(client.describeDeliveryStream(request)).handle404()
 
       override def listStreams(request: ListDeliveryStreamsRequest): F[ListDeliveryStreamsResult] =
-        blocker.delay(client.listDeliveryStreams(request))
+        Sync[F].blocking(client.listDeliveryStreams(request))
 
       override def listTags(request: ListTagsForDeliveryStreamRequest): F[Option[ListTagsForDeliveryStreamResult]] =
-        blocker.delay(client.listTagsForDeliveryStream(request)).handle404()
+        Sync[F].blocking(client.listTagsForDeliveryStream(request)).handle404()
 
       override def tag(request: TagDeliveryStreamRequest): F[Option[TagDeliveryStreamResult]] =
-        blocker.delay(client.tagDeliveryStream(request)).handle404()
+        Sync[F].blocking(client.tagDeliveryStream(request)).handle404()
 
       override def untag(request: UntagDeliveryStreamRequest): F[Option[UntagDeliveryStreamResult]] =
-        blocker.delay(client.untagDeliveryStream(request)).handle404()
+        Sync[F].blocking(client.untagDeliveryStream(request)).handle404()
 
       override def startStreamEncryption(
         request: StartDeliveryStreamEncryptionRequest
       ): F[Option[StartDeliveryStreamEncryptionResult]] =
-        blocker.delay(client.startDeliveryStreamEncryption(request)).handle404()
+        Sync[F].blocking(client.startDeliveryStreamEncryption(request)).handle404()
 
       override def stopStreamEncryption(
         request: StopDeliveryStreamEncryptionRequest
       ): F[Option[StopDeliveryStreamEncryptionResult]] =
-        blocker.delay(client.stopDeliveryStreamEncryption(request)).handle404()
+        Sync[F].blocking(client.stopDeliveryStreamEncryption(request)).handle404()
 
       override def updateDest(request: UpdateDestinationRequest): F[Option[UpdateDestinationResult]] = {
-        blocker.delay(client.updateDestination(request)).handle404()
+        Sync[F].blocking(client.updateDestination(request)).handle404()
       }
     }
 
-  def apply[F[_]: Sync: Sleep: ContextShift](
-    builder: AmazonKinesisFirehoseClientBuilder,
-    blocker: Blocker
+  def apply[F[_]: Sync: Sleep](
+    builder: AmazonKinesisFirehoseClientBuilder
   ): Resource[F, Firehose[F]] = {
-    Resource.make(blocker.delay(builder.build()))(k => blocker.delay(k.shutdown())).map(Firehose(_, blocker))
+    Resource.make(Sync[F].blocking(builder.build()))(k => Sync[F].blocking(k.shutdown())).map(Firehose(_))
   }
 
-  def default[F[_]: Sync: Sleep: ContextShift](blocker: Blocker): Resource[F, Firehose[F]] = {
-    Firehose(AmazonKinesisFirehoseClient.builder(), blocker)
+  def default[F[_]: Sync: Sleep]: Resource[F, Firehose[F]] = {
+    Firehose(AmazonKinesisFirehoseClient.builder())
   }
 }

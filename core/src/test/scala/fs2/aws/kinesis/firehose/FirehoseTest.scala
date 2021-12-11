@@ -18,9 +18,8 @@
 package fs2.aws.kinesis.firehose
 
 import java.nio.ByteBuffer
-import java.util.concurrent.Executors
 
-import cats.effect.{Blocker, IO, Resource, Sync}
+import cats.effect.{IO, Resource, Sync}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClientBuilder
 import com.amazonaws.services.kinesisfirehose.model._
@@ -31,7 +30,6 @@ import fs2.aws.kinesis.firehose.implicits._
 import munit.CatsEffectSuite
 import org.testcontainers.containers.localstack.LocalStackContainer.Service
 
-import scala.concurrent.ExecutionContext
 import scala.util.Random
 
 class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
@@ -42,20 +40,17 @@ class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
   val firehose: Fixture[Firehose[IO]] = ResourceSuiteLocalFixture(
     "firehose",
     Resource
-      .make(IO(Executors.newSingleThreadExecutor()))(ex => IO(ex.shutdown()))
-      .map(ExecutionContext.fromExecutor)
-      .map(Blocker.liftExecutionContext)
-      .flatMap { blocker =>
-        withContainers { firehose =>
-          Firehose[IO](
+      .eval(
+        IO(
+          withContainers { firehose =>
             AmazonKinesisFirehoseClientBuilder
               .standard()
               .withEndpointConfiguration(firehose.container.getEndpointConfiguration(Service.FIREHOSE))
-              .withCredentials(firehose.container.getDefaultCredentialsProvider),
-            blocker
-          )
-        }
-      }
+              .withCredentials(firehose.container.getDefaultCredentialsProvider)
+          }
+        )
+      )
+      .flatMap(Firehose[IO](_))
   )
 
   override def munitFixtures = List(firehose)
@@ -72,7 +67,7 @@ class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
       .assert
   }
 
-  test("batchPut") {
+  test("batch put") {
     firehose()
       .testStream()
       .use { stream =>
@@ -82,14 +77,14 @@ class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
       .assertEquals(0)
   }
 
-  test("describeNonExistentStream") {
+  test("describe non existing stream") {
     firehose()
       .describeStream(new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString))
       .map(_.isEmpty)
       .assert
   }
 
-  test("describeExistingStream") {
+  test("describe existing stream") {
     firehose()
       .testStream()
       .use { stream =>
@@ -101,7 +96,7 @@ class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
       .assert
   }
 
-  test("listSteams") {
+  test("list streams") {
     firehose().testStream().use { stream =>
       firehose()
         .listStreams(new ListDeliveryStreamsRequest())

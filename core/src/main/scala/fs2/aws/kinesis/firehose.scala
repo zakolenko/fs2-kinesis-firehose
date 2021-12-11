@@ -20,7 +20,7 @@ package fs2.aws.kinesis
 import java.nio.ByteBuffer
 
 import cats.Foldable
-import cats.effect.{Concurrent, Timer}
+import cats.effect.{Concurrent, Temporal}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model.{PutRecordBatchRequest, PutRecordBatchResult, Record}
 import retry.RetryPolicy
@@ -43,7 +43,7 @@ package object firehose {
   }
 
   private def produceChunks[
-    F[_]: Concurrent: Timer,
+    F[_]: Concurrent: Temporal,
     C[_]: Foldable,
     T: Serializer
   ](
@@ -65,7 +65,7 @@ package object firehose {
       .through(produce(client)(parallelism, mRetryPolicy))
   }
 
-  def produce[F[_]: Concurrent: Timer, T: Serializer](settings: ProducerSettings[F])(
+  def produce[F[_]: Concurrent: Temporal, T: Serializer](settings: ProducerSettings[F])(
     client: Firehose[F]
   ): fs2.Pipe[F, T, PutRecordBatchResult] = { elements =>
     elements
