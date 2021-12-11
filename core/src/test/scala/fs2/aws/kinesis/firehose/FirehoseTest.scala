@@ -59,7 +59,7 @@ class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
   )
 
   override def munitFixtures = List(firehose)
-  
+
   test("put") {
     firehose()
       .testStream()
