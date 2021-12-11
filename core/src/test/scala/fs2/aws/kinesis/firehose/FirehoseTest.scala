@@ -17,88 +17,106 @@
 
 package fs2.aws.kinesis.firehose
 
-import cats.effect.{Resource, Sync}
+import java.nio.ByteBuffer
+import java.util.concurrent.Executors
+
+import cats.effect.{Blocker, IO, Resource, Sync}
 import cats.implicits._
-import cloud.localstack.LocalstackTestRunner
-import cloud.localstack.docker.annotation.LocalstackDockerProperties
+import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClientBuilder
 import com.amazonaws.services.kinesisfirehose.model._
-import org.junit.Test
+import com.dimafeng.testcontainers.LocalStackContainer
+import com.dimafeng.testcontainers.munit.TestContainerForAll
 import fs2.aws.kinesis.firehose.JavaConversions._
 import fs2.aws.kinesis.firehose.implicits._
-import org.junit.runner.RunWith
+import munit.CatsEffectSuite
+import org.testcontainers.containers.localstack.LocalStackContainer.Service
 
+import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-@RunWith(classOf[LocalstackTestRunner])
-@LocalstackDockerProperties(randomizePorts = true, services = Array("firehose"))
-class FirehoseTest extends BaseFirehoseTest {
+class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
   import FirehoseTest._
 
-  @Test
-  def put(): Unit = {
-    runSync {
-      for {
-        firehose <- firehoseR
-        stream <- firehose.testStream()
-        _ <- Resource.eval(
-          firehose.put(
-            new PutRecordRequest().withDeliveryStreamName(stream).withRecord(randomRecord)
+  override val containerDef: LocalStackContainer.Def = LocalStackContainer.Def(services = List(Service.FIREHOSE))
+
+  val firehose: Fixture[Firehose[IO]] = ResourceSuiteLocalFixture(
+    "firehose",
+    Resource
+      .make(IO(Executors.newSingleThreadExecutor()))(ex => IO(ex.shutdown()))
+      .map(ExecutionContext.fromExecutor)
+      .map(Blocker.liftExecutionContext)
+      .flatMap { blocker =>
+        withContainers { firehose =>
+          Firehose[IO](
+            AmazonKinesisFirehoseClientBuilder
+              .standard()
+              .withEndpointConfiguration(firehose.container.getEndpointConfiguration(Service.FIREHOSE))
+              .withCredentials(firehose.container.getDefaultCredentialsProvider),
+            blocker
           )
+        }
+      }
+  )
+
+  override def munitFixtures = List(firehose)
+
+  test("put") {
+    firehose()
+      .testStream()
+      .use { stream =>
+        firehose().put(
+          new PutRecordRequest().withDeliveryStreamName(stream).withRecord(randomRecord)
         )
-      } yield ()
-    }
+      }
+      .map(_.getRecordId.nonEmpty)
+      .assert
   }
 
-  @Test
-  def batchPut(): Unit = {
-    runSync {
-      for {
-        firehose <- firehoseR
-        stream <- firehose.testStream()
-        response <- Resource.eval(firehose.batchPut(stream, List.fill(500)(randomBytes(1000))))
-      } yield assert(response.getFailedPutCount == 0)
-    }
+  test("batchPut") {
+    firehose()
+      .testStream()
+      .use { stream =>
+        firehose().batchPut(stream, List.fill(500)(randomBytes(1000)))
+      }
+      .map(_.getFailedPutCount.toInt)
+      .assertEquals(0)
   }
 
-  @Test
-  def describeNonExistentStream(): Unit = {
-    runSync {
-      for {
-        firehose <- firehoseR
-        res <- Resource.eval(
-          firehose.describeStream(
-            new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString)
-          )
+  test("describeNonExistentStream") {
+    firehose()
+      .describeStream(new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString))
+      .map(_.isEmpty)
+      .assert
+  }
+
+  test("describeExistingStream") {
+    firehose()
+      .testStream()
+      .use { stream =>
+        firehose().describeStream(
+          new DescribeDeliveryStreamRequest().withDeliveryStreamName(stream)
         )
-      } yield assert(res.isEmpty)
+      }
+      .map(_.nonEmpty)
+      .assert
+  }
+
+  test("listSteams") {
+    firehose().testStream().use { stream =>
+      firehose()
+        .listStreams(new ListDeliveryStreamsRequest())
+        .map(_.getDeliveryStreamNames.asScala.toList)
+        .assertEquals(List(stream))
     }
   }
 
-  @Test
-  def describeExistingStream(): Unit = {
-    runSync {
-      for {
-        firehose <- firehoseR
-        stream <- firehose.testStream()
-        res <- Resource.eval(
-          firehose.describeStream(
-            new DescribeDeliveryStreamRequest().withDeliveryStreamName(stream)
-          )
-        )
-      } yield assert(res.nonEmpty)
-    }
+  protected def randomBytes(size: Int = 20): Array[Byte] = {
+    val bytes = new Array[Byte](size)
+    scala.util.Random.nextBytes(bytes)
+    bytes
   }
 
-  @Test
-  def listSteams(): Unit = {
-    runSync {
-      for {
-        firehose <- firehoseR
-        stream <- firehose.testStream()
-        res <- Resource.eval(firehose.listStreams(new ListDeliveryStreamsRequest()))
-      } yield assert(res.getDeliveryStreamNames.asScala == List(stream))
-    }
-  }
+  protected def randomRecord: Record = new Record().withData(ByteBuffer.wrap(randomBytes()))
 }
 
 object FirehoseTest {
