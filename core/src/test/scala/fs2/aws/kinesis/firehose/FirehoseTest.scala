@@ -37,9 +37,9 @@ import scala.util.Random
 class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
   import FirehoseTest._
 
-  override val containerDef = LocalStackContainer.Def(services = List(Service.FIREHOSE))
+  override val containerDef: LocalStackContainer.Def = LocalStackContainer.Def(services = List(Service.FIREHOSE))
 
-  val firehose = ResourceSuiteLocalFixture(
+  val firehose: Fixture[Firehose[IO]] = ResourceSuiteLocalFixture(
     "firehose",
     Resource
       .make(IO(Executors.newSingleThreadExecutor()))(ex => IO(ex.shutdown()))
@@ -58,57 +58,56 @@ class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
       }
   )
 
-  def firehoseR: Resource[IO, Firehose[IO]] = Resource.eval[IO, Firehose[IO]](IO(firehose()))
-
+  override def munitFixtures = List(firehose)
+  
   test("put") {
-    for {
-      firehose <- firehoseR
-      stream <- firehose.testStream()
-      _ <- Resource.eval(
-        firehose.put(
+    firehose()
+      .testStream()
+      .use { stream =>
+        firehose().put(
           new PutRecordRequest().withDeliveryStreamName(stream).withRecord(randomRecord)
         )
-      )
-    } yield ()
+      }
+      .map(_.getRecordId.nonEmpty)
+      .assert
   }
 
   test("batchPut") {
-    for {
-      firehose <- firehoseR
-      stream <- firehose.testStream()
-      response <- Resource.eval(firehose.batchPut(stream, List.fill(500)(randomBytes(1000))))
-    } yield assert(response.getFailedPutCount == 0)
+    firehose()
+      .testStream()
+      .use { stream =>
+        firehose().batchPut(stream, List.fill(500)(randomBytes(1000)))
+      }
+      .map(_.getFailedPutCount.toInt)
+      .assertEquals(0)
   }
 
   test("describeNonExistentStream") {
-    for {
-      firehose <- firehoseR
-      res <- Resource.eval(
-        firehose.describeStream(
-          new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString)
-        )
-      )
-    } yield assert(res.isEmpty)
+    firehose()
+      .describeStream(new DescribeDeliveryStreamRequest().withDeliveryStreamName(Random.alphanumeric.take(10).mkString))
+      .map(_.isEmpty)
+      .assert
   }
 
   test("describeExistingStream") {
-    for {
-      firehose <- firehoseR
-      stream <- firehose.testStream()
-      res <- Resource.eval(
-        firehose.describeStream(
+    firehose()
+      .testStream()
+      .use { stream =>
+        firehose().describeStream(
           new DescribeDeliveryStreamRequest().withDeliveryStreamName(stream)
         )
-      )
-    } yield assert(res.nonEmpty)
+      }
+      .map(_.nonEmpty)
+      .assert
   }
 
   test("listSteams") {
-    for {
-      firehose <- firehoseR
-      stream <- firehose.testStream()
-      res <- Resource.eval(firehose.listStreams(new ListDeliveryStreamsRequest()))
-    } yield assert(res.getDeliveryStreamNames.asScala == List(stream))
+    firehose().testStream().use { stream =>
+      firehose()
+        .listStreams(new ListDeliveryStreamsRequest())
+        .map(_.getDeliveryStreamNames.asScala.toList)
+        .assertEquals(List(stream))
+    }
   }
 
   protected def randomBytes(size: Int = 20): Array[Byte] = {
