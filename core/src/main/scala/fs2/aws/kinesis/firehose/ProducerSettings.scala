@@ -57,8 +57,11 @@ object ProducerSettings {
     override def withSeparator[S: Serializer](separator: S): ProducerSettings[F] =
       copy(separator = Serializer[S].apply(separator))
 
-    override def withBatchSize(batchSize: Int): ProducerSettings[F] =
+    override def withBatchSize(batchSize: Int): ProducerSettings[F] = {
+      require(batchSize <= 500, "batchSize should be <= 500")
       copy(batchSize = batchSize)
+    }
+
     override def withParallelism(parallelism: Int): ProducerSettings[F] = copy(parallelism = parallelism)
     override def withTimeWindow(timeWindow: FiniteDuration): ProducerSettings[F] = copy(timeWindow = timeWindow)
 
