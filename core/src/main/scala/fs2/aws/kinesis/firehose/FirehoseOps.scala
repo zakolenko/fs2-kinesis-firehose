@@ -22,10 +22,10 @@ import cats.effect.{Resource, Sync}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model._
 import fs2.aws.kinesis.firehose.implicits._
-import fs2.aws.kinesis.firehose.JavaConversions._
 import fs2.aws.kinesis.firehose.{Serializer => FirehoseSerializer}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.jdk.CollectionConverters.BufferHasAsJava
 
 class FirehoseOps[F[_]](private val f: Firehose[F]) extends AnyVal {
 

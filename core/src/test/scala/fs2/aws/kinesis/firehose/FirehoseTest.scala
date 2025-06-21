@@ -18,18 +18,18 @@
 package fs2.aws.kinesis.firehose
 
 import java.nio.ByteBuffer
-
 import cats.effect.{IO, Resource, Sync}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClientBuilder
 import com.amazonaws.services.kinesisfirehose.model._
 import com.dimafeng.testcontainers.LocalStackContainer
 import com.dimafeng.testcontainers.munit.TestContainerForAll
-import fs2.aws.kinesis.firehose.JavaConversions._
 import fs2.aws.kinesis.firehose.implicits._
 import munit.CatsEffectSuite
+import munit.catseffect.IOFixture
 import org.testcontainers.containers.localstack.LocalStackContainer.Service
 
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.util.Random
 
 class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
@@ -37,7 +37,7 @@ class FirehoseTest extends CatsEffectSuite with TestContainerForAll {
 
   override val containerDef: LocalStackContainer.Def = LocalStackContainer.Def(services = List(Service.FIREHOSE))
 
-  val firehose: Fixture[Firehose[IO]] = ResourceSuiteLocalFixture(
+  val firehose: IOFixture[Firehose[IO]] = ResourceSuiteLocalFixture(
     "firehose",
     Resource
       .eval(

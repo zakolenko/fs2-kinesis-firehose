@@ -18,9 +18,6 @@
 package fs2.aws.kinesis.firehose
 
 import cats.Applicative
-import eu.timepit.refined.W
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.numeric.LessEqual
 import retry.RetryPolicy
 
 import scala.concurrent.duration._
@@ -32,8 +29,8 @@ trait ProducerSettings[F[_]] {
   def separator: Array[Byte]
   def withSeparator[S: Serializer](s: S): ProducerSettings[F]
 
-  def batchSize: Int Refined LessEqual[W.`500`.T]
-  def withBatchSize(batchSize: Int Refined LessEqual[W.`500`.T]): ProducerSettings[F]
+  def batchSize: Int
+  def withBatchSize(batchSize: Int): ProducerSettings[F]
 
   def parallelism: Int
   def withParallelism(parallelism: Int): ProducerSettings[F]
@@ -50,7 +47,7 @@ object ProducerSettings {
   private[this] case class ProducerSettingsImpl[F[_]](
     deliveryStream: String,
     separator: Array[Byte],
-    batchSize: Int Refined LessEqual[W.`500`.T],
+    batchSize: Int,
     parallelism: Int,
     timeWindow: FiniteDuration,
     retryPolicy: Option[RetryPolicy[F]]
@@ -60,8 +57,11 @@ object ProducerSettings {
     override def withSeparator[S: Serializer](separator: S): ProducerSettings[F] =
       copy(separator = Serializer[S].apply(separator))
 
-    override def withBatchSize(batchSize: Int Refined LessEqual[W.`500`.T]): ProducerSettings[F] =
+    override def withBatchSize(batchSize: Int): ProducerSettings[F] = {
+      require(batchSize <= 500, "batchSize should be <= 500")
       copy(batchSize = batchSize)
+    }
+
     override def withParallelism(parallelism: Int): ProducerSettings[F] = copy(parallelism = parallelism)
     override def withTimeWindow(timeWindow: FiniteDuration): ProducerSettings[F] = copy(timeWindow = timeWindow)
 
@@ -72,7 +72,6 @@ object ProducerSettings {
   def apply[F[_]: Applicative, S: Serializer](deliveryStream: String, separator: S): ProducerSettings[F] = {
     import cats.implicits._
     import retry.RetryPolicies._
-    import eu.timepit.refined.auto._
 
     new ProducerSettingsImpl[F](
       deliveryStream = deliveryStream,
