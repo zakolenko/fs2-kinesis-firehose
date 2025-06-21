@@ -18,15 +18,14 @@
 package fs2.aws.kinesis
 
 import java.nio.ByteBuffer
-
 import cats.Foldable
 import cats.effect.{Concurrent, Temporal}
 import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model.{PutRecordBatchRequest, PutRecordBatchResult, Record}
 import retry.RetryPolicy
-import fs2.aws.kinesis.firehose.JavaConversions._
 
 import scala.collection.mutable.ArrayBuffer
+import scala.jdk.CollectionConverters.BufferHasAsJava
 
 package object firehose {
 

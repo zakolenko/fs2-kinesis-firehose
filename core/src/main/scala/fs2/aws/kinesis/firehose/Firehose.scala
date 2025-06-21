@@ -22,7 +22,8 @@ import cats.implicits._
 import com.amazonaws.services.kinesisfirehose.model._
 import com.amazonaws.services.kinesisfirehose._
 import retry.{RetryPolicy, Sleep}
-import fs2.aws.kinesis.firehose.JavaConversions._
+
+import scala.jdk.CollectionConverters.{CollectionHasAsScala, IterableHasAsJava}
 
 trait Firehose[F[_]] {
 
@@ -91,7 +92,7 @@ object Firehose {
                           .filter { case (_, rec) => rec.getRecordId eq null }
                           .map(_._1)
                           .toList
-                          .asJava
+                          .asJavaCollection
                       )
                     }
                   }

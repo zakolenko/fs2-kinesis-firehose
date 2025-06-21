@@ -45,7 +45,7 @@ lazy val sharedSettings = Seq(
   githubRelativeRepositoryID := "fs2-kinesis-firehose",
   organization := "io.github.zakolenko",
   scalaVersion := "2.13.3",
-  crossScalaVersions := Seq("2.12.10", "2.13.3", "3.7.1"),
+  crossScalaVersions := Seq("2.13.3", "3.7.1"),
   // More version specific compiler options
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, v)) if v <= 12 =>
@@ -60,8 +60,6 @@ lazy val sharedSettings = Seq(
   }),
   // Turning off fatal warnings for doc generation
   scalacOptions.in(Compile, doc) ~= filterConsoleScalacOptions,
-  addCompilerPlugin(("org.typelevel" % "kind-projector" % KindProjectorVersion).cross(CrossVersion.full)),
-  addCompilerPlugin("com.olegpy" %% "better-monadic-for" % BetterMonadicForVersion),
   // ScalaDoc settings
   autoAPIMappings := true,
   scalacOptions in ThisBuild ++= Seq(
@@ -132,7 +130,6 @@ def defaultProjectConfiguration(pr: Project) = {
     .settings(sharedSettings)
     .settings(doctestTestSettings(DoctestTestFramework.Minitest))
     .settings(crossVersionSharedSources)
-    .settings(requiredMacroCompatDeps(MacroParadiseVersion))
     .settings(
       filterOutMultipleDependenciesFromGeneratedPomXml(
         "groupId" -> "org.scoverage".r :: Nil,
@@ -229,7 +226,7 @@ lazy val core = project
       // For testing
       "com.dimafeng" %% "testcontainers-scala-localstack" % "0.39.12" % Test,
       "com.dimafeng" %% "testcontainers-scala-munit" % "0.39.12" % Test,
-      "org.typelevel" %% "munit-cats-effect-3" % "1.0.0" % Test,
+      "org.typelevel" %% "munit-cats-effect" % "2.1.0" % Test,
       "org.scalameta" %% "munit" % "0.7.29" % Test
     )
   )
