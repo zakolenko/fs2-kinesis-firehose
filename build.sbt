@@ -225,9 +225,9 @@ lazy val core = project
       "org.typelevel" %% "cats-effect-std" % CatsEffectVersion,
       // For testing
       "com.dimafeng" %% "testcontainers-scala-localstack" % "0.39.12" % Test,
-      "com.dimafeng" %% "testcontainers-scala-munit" % "0.39.12" % Test,
+      "com.dimafeng" %% "testcontainers-scala-munit" % "0.43.0" % Test,
       "org.typelevel" %% "munit-cats-effect" % "2.1.0" % Test,
-      "org.scalameta" %% "munit" % "0.7.29" % Test
+      "org.scalameta" %% "munit" % "1.0.0" % Test
     )
   )
 
