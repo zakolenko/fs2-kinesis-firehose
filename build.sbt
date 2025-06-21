@@ -45,7 +45,7 @@ lazy val sharedSettings = Seq(
   githubRelativeRepositoryID := "fs2-kinesis-firehose",
   organization := "io.github.zakolenko",
   scalaVersion := "2.13.3",
-  crossScalaVersions := Seq("2.12.10", "2.13.3"),
+  crossScalaVersions := Seq("2.12.10", "2.13.3", "3.7.1"),
   // More version specific compiler options
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, v)) if v <= 12 =>

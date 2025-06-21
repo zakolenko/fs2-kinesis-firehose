@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         java: [8, 11]
-        scala: [2.12.12, 2.13.3]
+        scala: [2.12.12, 2.13.3, 3.7.1]
         command: ["ci-jvm"]
 
     runs-on: ${{ matrix.os }}
@@ -40,7 +40,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         java: [11]
-        scala: [2.12.12, 2.13.3]
+        scala: [2.12.12, 2.13.3, 3.7.1]
         command: [ci-package]
 
     runs-on: ${{ matrix.os }}
