@@ -65,7 +65,7 @@ jobs:
   publish_sonatype:
     name: Publish to Sonatype
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: [ jvm-tests, package-tests, doc-tests ]
+    needs: [ jvm-tests, package-tests ]
     strategy:
       fail-fast: true
       max-parallel: 1
