@@ -69,7 +69,7 @@ package object firehose {
     client: Firehose[F]
   ): fs2.Pipe[F, T, PutRecordBatchResult] = { elements =>
     elements
-      .groupWithin(settings.batchSize.value, settings.timeWindow)
+      .groupWithin(settings.batchSize, settings.timeWindow)
       .through(
         produceChunks(
           settings.deliveryStream,
