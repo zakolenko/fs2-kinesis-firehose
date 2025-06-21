@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
         java: [8, 11]
         scala: [2.12.12, 2.13.3, 3.7.1]
         command: ["ci-jvm"]
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
         java: [11]
         scala: [2.12.12, 2.13.3, 3.7.1]
         command: [ci-package]
@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
         java: [11]
         scala: [2.13.3]
         command: ["ci-doc"]
@@ -105,7 +105,7 @@ jobs:
       matrix:
         command: [ci-release]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: olafurpg/setup-scala@v10
@@ -138,7 +138,7 @@ jobs:
     name: Publish Website
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     needs: [ publish_sonatype ]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: olafurpg/setup-scala@v10
