@@ -79,18 +79,33 @@ jobs:
         with:
           java-version: "adopt@1.8"
 
-      - name: Install GnuPG2
-        run: |
-          sudo apt-get update && sudo apt-get -y install gnupg2
-          mkdir ~/.gnupg && chmod 700 ~/.gnupg
-          echo use-agent >> ~/.gnupg/gpg.conf
-          echo pinentry-mode loopback >> ~/.gnupg/gpg.conf
-          echo allow-loopback-pinentry >> ~/.gnupg/gpg-agent.conf
-          chmod 600 ~/.gnupg/*
-          echo RELOADAGENT | gpg-connect-agent
-          echo $PGP_SECRET | base64 --decode | gpg --import --no-tty --batch --yes
+      - name: Import signing key
+        if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''
         env:
-          PGP_SECRET: ${{secrets.PGP_SECRET}}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        run: |
+          echo "$PGP_SECRET" | base64 -d -i - | gpg --import --no-tty --batch --yes
+          gpg --list-secret-keys
+
+      - name: Import signing key and strip passphrase
+        if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''
+        env:
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        run: |
+          echo "$PGP_SECRET" | base64 -d -i - > /tmp/signing-key.gpg
+          echo "$PGP_PASSPHRASE" | gpg --pinentry-mode loopback --passphrase-fd 0 --import /tmp/signing-key.gpg
+          gpg --list-secret-keys
+          (echo "$PGP_PASSPHRASE"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase $(gpg --list-secret-keys --with-colons 2> /dev/null | grep '^sec:' | cut --delimiter ':' --fields 5 | tail -n 1)
+
+      - name: Test GPG Signing
+        run: |
+          echo "test" > test.txt
+          gpg --batch --pinentry-mode loopback --detach-sign --armor --output test.txt.asc test.txt
+          ls -l test.txt.asc
+        env:
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
 
       - name: sbt ci-release
         run: |
