@@ -106,6 +106,7 @@ jobs:
           ls -l test.txt.asc
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
 
       - name: sbt ci-release
         run: |
